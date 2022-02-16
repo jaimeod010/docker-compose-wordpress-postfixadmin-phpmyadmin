@@ -1,0 +1,64 @@
+
+version: '3.4'
+services:
+   postfixadmin:
+     depends_on:
+       - pe
+     image: postfixadmin:latest
+     ports:
+       - 8000:80
+     restart: always
+     environment:
+       POSTFIXADMIN_DB_TYPE: mysqli
+       POSTFIXADMIN_DB_HOST: pe
+       POSTFIXADMIN_DB_USER: postfixadmin
+       POSTFIXADMIN_DB_NAME: postfixadmin
+       POSTFIXADMIN_DB_PASSWORD: postfixadminPassword
+       POSTFIXADMIN_SMTP_SERVER: postfix
+       POSTFIXADMIN_SMTP_PORT: 25
+       POSTFIXADMIN_ENCRYPT: md5crypt
+   wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - wordpress:/var/www/html
+   db:
+    image: mysql:5.7
+    restart: always
+
+
+    
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - db:/var/lib/mysql
+
+   pe:
+     image: mysql:5.7
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: notSecureChangeMe
+       MYSQL_DATABASE: postfixadmin
+       MYSQL_USER: postfixadmin
+       MYSQL_PASSWORD: postfixadminPassword
+   phpmyadmin:
+     image: phpmyadmin
+     restart: always
+     ports:
+      - 9999:80
+     environment:
+     PMA_ARBITRARY: 1
+volumes:
+  wordpress:
+  db:
+
